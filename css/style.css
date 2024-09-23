@@ -104,9 +104,23 @@
         margin-top: 8px;
         border-top: 1px solid var(--light);
     }
+    .saloonlogo{
+        font-size: 20px;
+        position: relative;
+        left: 155px !important;
+        color: #6c7293;
+        bottom: 25px;
+    }
 }
 
 @media (min-width: 992px) {
+    .saloonlogo{
+        font-size: 20px;
+        position: relative;
+        left: 200px !important;
+        color: #6c7293;
+        bottom: 25px;
+    }
     .navbar.shadow-sm .navbar-nav .nav-link {
         padding: 20px 0;
     }
@@ -327,3 +341,10 @@
 .footer .copyright a:hover {
     color: var(--primary);
 }
+/* .saloonlogo{
+    font-size: 20px;
+    position: relative;
+    left: 155px;
+    color: #6c7293;
+    bottom: 25px;
+} */
