@@ -318,9 +318,7 @@
     <script src="https://unpkg.com/html5-qrcode">
     </script>
     <script>
-        // script.js file
-
-        function domReady(fn) {
+    function domReady(fn) {
     if (
         document.readyState === "complete" ||
         document.readyState === "interactive"
@@ -350,13 +348,22 @@ domReady(function () {
         console.warn(`QR code scan failed. Error: ${error}`);
     }
 
+    // Ensure proper cleanup before rendering a new instance
+    let htmlscanner;
+    if (htmlscanner) {
+        htmlscanner.clear();  // Make sure any previous scanner is cleared before initializing
+    }
+
     // Setup the scanner
-    let htmlscanner = new Html5QrcodeScanner(
+    htmlscanner = new Html5QrcodeScanner(
         "my-qr-reader",
         { fps: 10, qrbox: 250 }
     );
+
+    // Ensure successful render or failure case
     htmlscanner.render(onScanSuccess, onScanFailure);
 });
+
 
     </script>
 </body>
