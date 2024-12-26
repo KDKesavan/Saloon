@@ -315,9 +315,70 @@
 
     <!-- Template Javascript -->
     <script src="js/main.js"></script>
-    <script src="https://unpkg.com/html5-qrcode">
-    </script>
+    <!-- <script src="https://unpkg.com/html5-qrcode"> -->
+    <!-- </script> -->
+    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
     <script>
+        function domReady(fn) {
+            if (document.readyState === "complete" || document.readyState === "interactive") {
+                setTimeout(fn, 1000);
+            } else {
+                document.addEventListener("DOMContentLoaded", fn);
+            }
+        }
+
+        domReady(function () {
+            let html5QrcodeScanner;
+
+            // On QR Code found
+            function onScanSuccess(decodedText, decodedResult) {
+                console.log("QR Code Text:", decodedText);
+                console.log("Decoded Result:", decodedResult);
+
+                // Navigate to the decoded URL
+                if (decodedText.startsWith("http://") || decodedText.startsWith("https://")) {
+                    window.location.href = decodedText;
+                } else {
+                    alert("Scanned QR Code is not a valid URL: " + decodedText);
+                }
+            }
+
+            // On QR Code scan failure
+            function onScanFailure(error) {
+                console.warn(`QR code scan failed. Error: ${error}`);
+            }
+
+            // Request camera permissions
+            async function requestCameraPermissions() {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                    stream.getTracks().forEach((track) => track.stop()); // Stop the stream after permission check
+                } catch (error) {
+                    alert("Camera access is required to scan QR codes. Please allow camera permissions.");
+                    location.reload(); // Reload page to ask for permissions again
+                }
+            }
+
+            // Initialize scanner
+            function initializeScanner() {
+                if (html5QrcodeScanner) {
+                    html5QrcodeScanner.clear().catch((error) => {
+                        console.warn("Failed to clear the scanner:", error);
+                    });
+                }
+
+                html5QrcodeScanner = new Html5QrcodeScanner(
+                    "my-qr-reader",
+                    { fps: 10, qrbox: 250 }
+                );
+                html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+            }
+
+            // Run permissions check and initialize scanner
+            requestCameraPermissions().then(() => initializeScanner());
+        });
+    </script>
+    <!-- <script>
         function domReady(fn) {
             if (
                 document.readyState === "complete" ||
@@ -365,7 +426,7 @@
         });
 
 
-    </script>
+    </script> -->
 </body>
 
 </html>
