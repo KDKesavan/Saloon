@@ -208,6 +208,13 @@
                                 </div>
                             </div>
                         </div>
+                        <!-- <div class="container">
+                            <h1>Scan QR Codes</h1>
+                            <div class="section">
+                                <div id="my-qr-reader"></div>
+                                <input type="file" id="upload-image" accept="image/*" />
+                            </div>
+                        </div> -->
 
                     </div>
                 </div>
@@ -317,69 +324,90 @@
     <script src="js/main.js"></script>
     <script src="https://unpkg.com/html5-qrcode">
     </script>
-    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
-    <script>
-        function domReady(fn) {
-            if (document.readyState === "complete" || document.readyState === "interactive") {
-                setTimeout(fn, 1000);
-            } else {
-                document.addEventListener("DOMContentLoaded", fn);
-            }
-        }
+    <!-- <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script> -->
 
-        domReady(function () {
-            let html5QrcodeScanner;
-
-            // Function to handle QR Code success
-            function onScanSuccess(decodedText, decodedResult) {
-                console.log("QR Code Text:", decodedText);
-                console.log("Decoded Result:", decodedResult);
-
-                // Automatically navigate to valid URL
-                try {
-                    const url = new URL(decodedText); // Validate if it's a proper URL
-                    window.location.href = url.href;  // Navigate to the URL
-                } catch (error) {
-                    alert("Scanned QR Code is not a valid URL: " + decodedText);
-                }
-            }
-
-            // Function to handle QR Code scan failure
-            function onScanFailure(error) {
-                console.warn(`QR code scan failed. Error: ${error}`);
-            }
-
-            // Function to request camera permissions
-            async function requestCameraPermissions() {
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                    stream.getTracks().forEach((track) => track.stop()); // Stop the stream after checking
-                } catch (error) {
-                    alert("Camera access is required to scan QR codes. Please allow camera permissions.");
-                    // location.reload(); // Reload the page to request permissions again
-                }
-            }
-
-            // Initialize the QR Code scanner
-            function initializeScanner() {
-                if (html5QrcodeScanner) {
-                    html5QrcodeScanner.clear().catch((error) => {
-                        console.warn("Failed to clear the scanner:", error);
-                    });
-                }
-
-                html5QrcodeScanner = new Html5QrcodeScanner(
-                    "my-qr-reader",
-                    { fps: 10, qrbox: 250 }
-                );
-                html5QrcodeScanner.render(onScanSuccess, onScanFailure);
-            }
-
-            // Request camera permissions and initialize scanner
-            requestCameraPermissions().then(() => initializeScanner());
-        });
-    </script>
     <!-- <script>
+      let htmlscanner; // Make sure htmlscanner is declared globally
+  
+      // Function to initialize or reset the scanner
+      function initializeScanner() {
+          if (htmlscanner) {
+              htmlscanner.clear();  // Clear any previous instance
+          }
+  
+          // Initialize the QR code scanner
+          htmlscanner = new Html5QrcodeScanner(
+              "my-qr-reader", 
+              { fps: 10, qrbox: 250 }  // Set FPS and QR box size
+          );
+  
+          // Render the scanner
+          htmlscanner.render(onScanSuccess, onScanFailure);
+      }
+  
+      // On QR Code found
+      function onScanSuccess(decodeText, decodeResult) {
+          console.log("QR Code Text:", decodeText);
+          console.log("Decoded Result:", decodeResult);
+  
+          // Navigate to the decoded URL
+          if (decodeText.startsWith("http://") || decodeText.startsWith("https://")) {
+              window.location.href = decodeText;
+          } else {
+              alert("Scanned QR Code is not a valid URL: " + decodeText);
+          }
+      }
+  
+      // On QR Code scan failure
+      function onScanFailure(error) {
+          console.warn(`QR code scan failed. Error: ${error}`);
+      }
+  
+      // Image file upload event listener
+      document.getElementById("upload-image").addEventListener("change", async (event) => {
+          const file = event.target.files[0];
+          if (!file) return;
+  
+          try {
+              const result = await Html5Qrcode.scanFile(file, true, {
+                  fps: 10, // Frames per second
+                  qrbox: { width: 250, height: 250 }, // QR box size
+                  disableFlip: false // Flip disabled to handle mirrored images
+              });
+  
+              // Handle the QR code result
+              if (result) {
+                  console.log("QR Code detected:", result);
+  
+                  // Check if the result is a valid URL
+                  if (result.startsWith("http://") || result.startsWith("https://")) {
+                      alert(`Navigating to: ${result}`);
+                      window.location.href = result; // Redirect to the URL
+                  } else {
+                      alert(`Scanned QR Code is not a valid URL: ${result}`);
+                  }
+              }
+          } catch (error) {
+              alert("No QR Code detected in the image. Please upload a clear image with a valid QR Code.");
+              console.error("QR Code scan failed:", error);
+          }
+      });
+  
+      // Initialize the scanner on page load or refresh
+      domReady(function () {
+          initializeScanner();
+      });
+  
+      // Helper function to detect when the DOM is ready
+      function domReady(fn) {
+          if (document.readyState === "complete" || document.readyState === "interactive") {
+              setTimeout(fn, 1000);
+          } else {
+              document.addEventListener("DOMContentLoaded", fn);
+          }
+      }
+  </script> -->
+    <script>
         function domReady(fn) {
             if (
                 document.readyState === "complete" ||
@@ -427,7 +455,7 @@
         });
 
 
-    </script> -->
+    </script>
 </body>
 
 </html>
